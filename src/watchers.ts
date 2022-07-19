@@ -64,9 +64,8 @@ class JiraWatcherManager {
     return watcherResponse.data.watchers.map(m => m.emailAddress);
   }
 
-  private async addRemoteWatcher(watcherEmail: string): Promise<RemoteWatcherResult> {
+  private async addRemoteWatcher(watcherEmail: string, watchersUrl: string): Promise<RemoteWatcherResult> {
     core.debug('JiraWatcherManager::addRemoteWatcher');
-    const watchersUrl = await this.watchersUrl();
     const reqBody = `"${watcherEmail}"`;
 
     // Wrap error with email that failed so it can be reported by consumer
@@ -93,17 +92,17 @@ class JiraWatcherManager {
     });
   }
 
-  private async deleteRemoteWatcher(watcherEmail: string): Promise<RemoteWatcherResult> {
+  private async deleteRemoteWatcher(watcherEmail: string, watchersUrl: string): Promise<RemoteWatcherResult> {
     core.info('JiraWatcherManager::deleteRemoteWatcher');
-    var watchersUrl = "";
-    try {
-      watchersUrl = await this.watchersUrl();
-      core.info(`Got watchers URL: ${watchersUrl}`);
-    } catch (error) {
-      var e = new Error()
-      core.error(JSON.stringify(e.stack));
-      core.info(`Error'd out while getting watchers url: ${JSON.stringify(error)}`);
-    }
+    // try {
+      // watchersUrl = await this.watchersUrl();
+    //   core.info(`Got watchers URL: ${watchersUrl}`);
+    // } catch (error) {
+    //   var e = new Error()
+    //   core.info(error);
+    //   core.info(JSON.stringify(e.stack));
+    //   core.info(`Error'd out while getting watchers url: ${JSON.stringify(error)}`);
+    // }
     watchersUrl = `${watchersUrl}?username=${watcherEmail}`;
     core.info(`deleteRemoteWatcher: ${watchersUrl}`);
 
@@ -164,6 +163,8 @@ class JiraWatcherManager {
     core.info('Removing watchers that should not be present:')
     core.info(JSON.stringify(watchersToDelete));
 
+    const watchersUrl = await this.watchersUrl();
+
     const mutateWatchersFn = (_watcherEmails: string[], mutationFn) => {
       return async () => {
         // Send independent watch requests in parallel. We don't care if some
@@ -179,7 +180,7 @@ class JiraWatcherManager {
         // 415 - Missing Content-Type header
         // Delete watchers is a simple delete call with the username as a q param
         const results = await Promise.allSettled(
-          _watcherEmails.map(email => mutationFn(email))
+          _watcherEmails.map(email => mutationFn(email, watchersUrl))
         );
 
         core.info('Got results from core watcher fn');
