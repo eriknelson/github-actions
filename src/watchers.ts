@@ -1,5 +1,11 @@
 import * as core from '@actions/core';
 import axios from 'axios';
+  
+type RemoteWatcherResult = {
+  email: string;
+  statusCode: number;
+  error: any;
+};
 
 class JiraWatcherManager {
   private jiraIssueUrl: string;
@@ -55,7 +61,7 @@ class JiraWatcherManager {
     return watcherResponse.data.watchers.map(m => m.emailAddress);
   }
 
-  private async setRemoteWatcher(watcherEmail: string) {
+  private async addRemoteWatcher(watcherEmail: string): Promise<RemoteWatcherResult> {
     const watchersUrl = await this.watchersUrl();
     const reqBody = `"${watcherEmail}"`;
 
@@ -67,14 +73,26 @@ class JiraWatcherManager {
           'Content-Type': 'application/json',
         },
       })
-      .then(() => resolve({email: watcherEmail, error: null}))
-      .catch(err => reject({email: watcherEmail, error: err}));
+      .then(response => {
+        resolve({
+          email: watcherEmail,
+          statusCode: response.status,
+          error: null,
+        });
+      })
+      .catch(err => {
+        reject({
+          email: watcherEmail,
+          statusCode: err.response.status,
+          error: err})
+      });
     });
   }
 
-  private async deleteRemoteWatcher(watcherEmail: string) {
+  private async deleteRemoteWatcher(watcherEmail: string): Promise<RemoteWatcherResult> {
     var watchersUrl = await this.watchersUrl();
     watchersUrl = `${watchersUrl}?username=${watcherEmail}`;
+    core.info(`deleteRemoteWatcher: ${watchersUrl}`);
 
     // Wrap error with email that failed so it can be reported by consumer
     return new Promise((resolve, reject) => {
@@ -84,8 +102,21 @@ class JiraWatcherManager {
           'Content-Type': 'application/json',
         },
       })
-      .then(() => resolve({email: watcherEmail, error: null}))
-      .catch(err => reject({email: watcherEmail, error: err}));
+      .then(response => {
+        resolve({
+          email: watcherEmail,
+          statusCode: response.status,
+          error: null,
+        });
+      })
+      .catch(err => {
+        reject({
+          email: watcherEmail,
+          statusCode: err.response.status,
+          error: err})
+      });
+      // .then(() => resolve({email: watcherEmail, error: null}))
+      // .catch(err => reject({email: watcherEmail, error: err}));
     });
   }
 
@@ -136,6 +167,9 @@ class JiraWatcherManager {
           _watcherEmails.map(email => mutationFn(email))
         );
 
+        core.info('Got results from core watcher fn');
+        core.info(`${JSON.stringify(results)}`);
+
         // Annoyingly Typescript has no way to understand what's in the results
         // array, so this actually requires a cast
         const failures = (results.filter(res =>res.status === 'rejected'
@@ -148,7 +182,7 @@ class JiraWatcherManager {
       }
     }
 
-    await mutateWatchersFn(watchersToAdd, this.setRemoteWatcher)();
+    await mutateWatchersFn(watchersToAdd, this.addRemoteWatcher)();
     await mutateWatchersFn(watchersToDelete, this.deleteRemoteWatcher)();
   }
 }
