@@ -92,7 +92,9 @@ class JiraWatcherManager {
     });
   }
 
-  private async deleteRemoteWatcher(watcherEmail: string, watchersUrl: string): Promise<RemoteWatcherResult> {
+  private async deleteRemoteWatcher(
+    watcherEmail: string, watchersUrl: string, token: string,
+  ): Promise<RemoteWatcherResult> {
     core.info('JiraWatcherManager::deleteRemoteWatcher');
     // try {
       // watchersUrl = await this.watchersUrl();
@@ -111,7 +113,7 @@ class JiraWatcherManager {
       core.info('Immediately before the axios delete call...');
       axios.delete(watchersUrl, {
         headers: {
-          'Authorization': `Bearer ${this.botToken}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       })
