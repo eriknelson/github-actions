@@ -108,6 +108,7 @@ class JiraWatcherManager {
 
     // Wrap error with email that failed so it can be reported by consumer
     return new Promise((resolve, reject) => {
+      core.info('Immediately before the axios delete call...');
       axios.delete(watchersUrl, {
         headers: {
           'Authorization': `Bearer ${this.botToken}`,
