@@ -30,6 +30,10 @@ inputs:
     description: |
       Comma separated list of accounts, represented by email addresses, that
       should be added automatically as a watcher to all jiras that sync
+  removeWatchers:
+    description: |
+      Comma separated list of accounts, represented by email addresses, that
+      should be removed automatically as a watcher to all jiras that sync
 outputs:
   issue:
     description: Key of the newly created issue
