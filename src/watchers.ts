@@ -197,7 +197,9 @@ class JiraWatcherManager {
       }
     }
 
+    core.info('watchers to add')
     await mutateWatchersFn(watchersToAdd, this.addRemoteWatcher)();
+    core.info('watchers to delete')
     await mutateWatchersFn(watchersToDelete, this.deleteRemoteWatcher)();
   }
 }
