@@ -51,7 +51,9 @@ class JiraWatcherManager {
     core.debug(`watchersUrl::issueKey ${this.issueKey}`);
 
     const bu = core.getInput("jiraBaseUrl");
-    return `${bu}/rest/api/2/issue/${this.issueKey}/watchers`;
+    const fullWatchersUrl = `${bu}/rest/api/2/issue/${this.issueKey}/watchers`;
+    core.debug(`Build full watchersUrl: ${fullWatchersUrl}`);
+    return fullWatchersUrl;
   }
 
   private async getJiraIssueWatchers(): Promise<string[]> {
