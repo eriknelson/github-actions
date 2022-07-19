@@ -142,7 +142,7 @@ class JiraWatcherManager {
           ) as PromiseRejectedResult[]);
 
         if(failures.length != 0) {
-          core.warning(`Failed to add ${failures.length} watchers:`)
+          core.warning(`Failed to change ${failures.length} watcher(s), operating on list: ${JSON.stringify(_watcherEmails)}:`);
           failures.forEach(err => core.error(JSON.stringify(err)));
         }
       }
