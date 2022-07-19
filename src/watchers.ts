@@ -63,6 +63,7 @@ class JiraWatcherManager {
   }
 
   private async addRemoteWatcher(watcherEmail: string): Promise<RemoteWatcherResult> {
+    core.debug('JiraWatcherManager::addRemoteWatcher');
     const watchersUrl = await this.watchersUrl();
     const reqBody = `"${watcherEmail}"`;
 
