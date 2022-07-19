@@ -43,7 +43,7 @@ class JiraWatcherManager {
   }
 
   private async watchersUrl() {
-    if(this.issueKey == '') {
+    if(this.issueKey === '') {
       const issueKey = await this.getJiraIssueKeyFromUrl(this.jiraIssueUrl);
       this.issueKey = issueKey;
     }
