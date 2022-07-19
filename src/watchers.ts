@@ -90,6 +90,7 @@ class JiraWatcherManager {
   }
 
   private async deleteRemoteWatcher(watcherEmail: string): Promise<RemoteWatcherResult> {
+    core.info('JiraWatcherManager::deleteRemoteWatcher');
     var watchersUrl = await this.watchersUrl();
     watchersUrl = `${watchersUrl}?username=${watcherEmail}`;
     core.info(`deleteRemoteWatcher: ${watchersUrl}`);
