@@ -43,6 +43,7 @@ class JiraWatcherManager {
   }
 
   private async watchersUrl() {
+    core.debug(`Prior to core debug: ${this.issueKey}`);
     if(this.issueKey === '') {
       const issueKey = await this.getJiraIssueKeyFromUrl(this.jiraIssueUrl);
       this.issueKey = issueKey;
@@ -52,7 +53,6 @@ class JiraWatcherManager {
     const bu = core.getInput("jiraBaseUrl");
     return `${bu}/rest/api/2/issue/${this.issueKey}/watchers`;
   }
-
 
   private async getJiraIssueWatchers(): Promise<string[]> {
     const watchersUrl = await this.watchersUrl();
