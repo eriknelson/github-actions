@@ -98,6 +98,8 @@ class JiraWatcherManager {
       watchersUrl = await this.watchersUrl();
       core.info(`Got watchers URL: ${watchersUrl}`);
     } catch (error) {
+      var e = new Error()
+      core.error(JSON.stringify(e.stack));
       core.info(`Error'd out while getting watchers url: ${JSON.stringify(error)}`);
     }
     watchersUrl = `${watchersUrl}?username=${watcherEmail}`;
